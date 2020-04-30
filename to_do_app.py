@@ -2,6 +2,22 @@ import sys
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
+class Users:
+    def __init__(self):
+        self.users=dict()
+
+    def add_user(self,username,email,password):
+        if username not in self.users:
+            self.users[username]=[password,email]
+        else:
+            print("you already have an acct")
+
+    def check_password(self,username,password):
+        if username in self.users:
+            if password==self.users[username][0]:
+                return True
+        return False
+
 class Login_Dialog(QtWidgets.QWidget):
     switch_window=QtCore.pyqtSignal(str)
     def __init__(self,controller):
@@ -73,10 +89,12 @@ class Login_Dialog(QtWidgets.QWidget):
 
 class Createacct_Dialog(QtWidgets.QWidget):
     switch_window=QtCore.pyqtSignal(str)
-    def __init__(self,controller):
+    def __init__(self,users):
         QtWidgets.QWidget.__init__(self)
-        self.controller=controller
+        print("in init")
+        self.users=users
     def setupUi(self, Dialog):
+        print("in createacct setup ui")
         Dialog.setObjectName("Dialog")
         Dialog.resize(599, 559)
         self.email_lineEdit_2 = QtWidgets.QTextEdit(Dialog)
@@ -136,6 +154,7 @@ class Createacct_Dialog(QtWidgets.QWidget):
 
     def switch(self):
         print("you clicked me")
+        self.users.add_users(self.uname.text(),self.email.text(),self.password.text())
         self.switch_window.emit("login")
 
         
@@ -245,8 +264,11 @@ class Preferences_Dialog(QtWidgets.QWidget):
 
 class ToDoList(QtWidgets.QWidget):
     switch_window=QtCore.pyqtSignal()
-    def __init__(self):
+    pythons=["Pictures/AngryPython.jpeg","Pictures/SadPython.jpeg","Pictures/HappyPython.jpeg","Pictures/ThrilledPython.jpeg"]
+    dogs=["Pictures/AngryDog.jpg","Pictures/SadDog.jpg","Pictures/HappyDog.jpg","Pictures/ThrilledDog.jpg"]
+    def __init__(self,python):
         QtWidgets.QWidget.__init__(self)
+        self.python=python
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(614, 497)
@@ -266,6 +288,17 @@ class ToDoList(QtWidgets.QWidget):
         self.productivity_enhancing_tech.setObjectName("productivity_enhancing_tech")
         self.todolist = QtWidgets.QLabel(self.centralwidget)
         self.todolist.setGeometry(QtCore.QRect(240, 120, 171, 71))
+        self.label = QtWidgets.QLabel(self.centralwidget)
+        self.label.setGeometry(QtCore.QRect(20, 230, 181, 121))
+        self.label.setStyleSheet("background-image: url(:/newPrefix/PYGKKT.jpg);\n"
+            "background-image: url(:/newPrefix/PYGKKT happy.jpg);")
+        self.label.setText("")
+        if self.python:
+            self.label.setPixmap(QtGui.QPixmap("Pictures/HappyPython.jpeg"))
+        else:
+            self.label.setPixmap(QtGui.QPixmap("Pictures/HappyDog.jpg"))
+        self.label.setScaledContents(True)
+        self.label.setObjectName("label")
         font = QtGui.QFont()
         font.setPointSize(20)
         self.todolist.setFont(font)
@@ -283,6 +316,7 @@ class ToDoList(QtWidgets.QWidget):
         self.verticalLayout.addWidget(self.lineEdit)
         self.listWidget = QtWidgets.QListWidget(self.verticalLayoutWidget)
         self.listWidget.setObjectName("listWidget")
+        self.listWidget.itemClicked.connect(self.setPetEmotion)
         self.verticalLayout.addWidget(self.listWidget)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
@@ -313,12 +347,53 @@ class ToDoList(QtWidgets.QWidget):
         print("return pressed")
         self.add_todo(self.lineEdit.text())
         self.lineEdit.setText("")
+        self.setPetEmotion()
+
+    def getPercentDone(self):
+        print("in getpercentdone")
+        numItems=self.listWidget.count()
+        numChecked=0
+        print("before loop",numItems)
+        for item in range(numItems):
+            print("item=",item)
+            if self.listWidget.item(item).checkState()==QtCore.Qt.Checked:
+                numChecked+=1
+            #print("self.listWidget.item",self.listWidget.item(item))
+        return numChecked/numItems
+            
+
+    def setPetEmotion(self):
+        pctdone=self.getPercentDone()
+        print("percent done",pctdone)
+        if self.python:
+            print("its a python")
+            if pctdone<=0.25:
+                self.label.setPixmap(QtGui.QPixmap(ToDoList.pythons[0]))
+            elif 0.25<pctdone<=0.5:
+                self.label.setPixmap(QtGui.QPixmap(ToDoList.pythons[1]))
+            elif 0.5<pctdone<=0.75:
+                self.label.setPixmap(QtGui.QPixmap(ToDoList.pythons[2]))
+            elif 0.75<pctdone<=1.0:
+                self.label.setPixmap(QtGui.QPixmap(ToDoList.pythons[3]))
+        else:
+            print("its a dog")
+            if pctdone<=0.25:
+                self.label.setPixmap(QtGui.QPixmap(ToDoList.dogs[0]))
+            elif 0.25<pctdone<=0.5:
+                self.label.setPixmap(QtGui.QPixmap(ToDoList.dogs[1]))
+            elif 0.5<pctdone<=0.75:
+                self.label.setPixmap(QtGui.QPixmap(ToDoList.dogs[2]))
+            elif 0.75<pctdone<=1.0:
+                self.label.setPixmap(QtGui.QPixmap(ToDoList.dogs[3]))
+
+        
 
 class Controller:
     def __init__(self):
         self.login_dialog=None
         self.dialog=None
         self.python=None
+        self.users=Users()
 
     def show_login(self):
         print("in show login")
@@ -332,8 +407,9 @@ class Controller:
 
     def show_createacct(self):
         print("in show_createacct")
-        self.createacct=Createacct_Dialog(self)
+        self.createacct=Createacct_Dialog(self.users)
         self.dialog=QtWidgets.QDialog()
+        print("before setup ui")
         self.createacct.setupUi(self.dialog)
         self.createacct.switch_window.connect(self.show_next)
         self.dialog.show()
@@ -353,12 +429,11 @@ class Controller:
 
     def show_todolist(self):
         print("in show todolist")
-        self.todolist=ToDoList()
+        self.todolist=ToDoList(self.python)
         self.todolist_dialog=QtWidgets.QMainWindow()
         self.todolist.setupUi(self.todolist_dialog)
         self.todolist.switch_window.connect(self.show_next)
         self.todolist_dialog.show()
-        self.todolist.add_todo("make a to do item")
         self.prefs_dialog.close()
 
     def show_next(self,next):
