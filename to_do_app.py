@@ -1,4 +1,5 @@
 import sys
+import pickle
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
@@ -18,6 +19,23 @@ class Users:
             if password==self.users[username][0]:
                 return True
         return False
+
+    def save_to_file(self,filename):
+        with open(filename,"wb") as f:
+            #print("file is open")
+            try:
+                pickle.dump(self.users,f)
+            except Exception as e:
+                print(e)
+
+    def load_from_file(self,filename):
+        with open(filename,"rb") as f:
+            #print("file is open")
+            try:
+                self.users=pickle.load(f)
+            except Exception as e:
+                print(e)
+                
 
 class Login_Dialog(QtWidgets.QWidget):
     switch_window=QtCore.pyqtSignal(str)
@@ -81,23 +99,23 @@ class Login_Dialog(QtWidgets.QWidget):
         self.signup_btn.setText(_translate("Dialog", "Sign Up"))
 
     def signup_clicked(self):
-        print("i am in login signup clicked")
+        #print("i am in login signup clicked")
         self.switch_window.emit("create")
 
     def login_clicked(self):
-        print("i am in login login clicked")
+        #print("i am in login login clicked")
         self.switch_window.emit("prefs")
 
 class Createacct_Dialog(QtWidgets.QWidget):
     switch_window=QtCore.pyqtSignal(str)
     def __init__(self,users):
         QtWidgets.QWidget.__init__(self)
-        print("in init")
+        #print("in init")
         self.users=users
     def setupUi(self, Dialog):
         Dialog.setObjectName("Dialog")
         Dialog.resize(599, 559)
-        print("in setup ui")
+        #print("in setup ui")
         self.email_lineEdit = QtWidgets.QLineEdit(Dialog)
         self.email_lineEdit.setGeometry(QtCore.QRect(240, 230, 181, 31))
         self.email_lineEdit.setObjectName("email_lineEdit")
@@ -120,7 +138,7 @@ class Createacct_Dialog(QtWidgets.QWidget):
         self.signup_btn = QtWidgets.QPushButton(Dialog)
         self.signup_btn.setGeometry(QtCore.QRect(270, 341, 113, 41))
         self.signup_btn.setObjectName("signup_btn")
-        print("before clicked connect")
+        #print("before clicked connect")
         self.signup_btn.clicked.connect(self.switch)
         self.PET = QtWidgets.QLabel(Dialog)
         self.PET.setGeometry(QtCore.QRect(250, 0, 151, 81))
@@ -156,15 +174,16 @@ class Createacct_Dialog(QtWidgets.QWidget):
         self.createacct.setText(_translate("Dialog", "CREATE ACCOUNT"))
 
     def switch(self):
-        print("you clicked me")
+        #print("you clicked me")
         print(self.uname_lineEdit.text())
-        print("past text")
+        #print("past text")
         print(self.email_lineEdit.text())
-        print("past email")
+        #print("past email")
         print(self.password_lineEdit.text())
-        print("past password")
+        #print("past password")
         self.users.add_user(self.uname_lineEdit.text(),self.email_lineEdit.text(),self.password_lineEdit.text())
         #self.users.add_user("fred","email@example.com","pass23")
+        self.users.save_to_file("pickle")
         self.switch_window.emit("login")
 
         
@@ -192,7 +211,7 @@ class Preferences_Dialog(QtWidgets.QWidget):
         self.PET = QtWidgets.QLabel(self.centralwidget)
         self.PET.setGeometry(QtCore.QRect(200, 10, 151, 81))
         font = QtGui.QFont()
-        print("first checkpoint in setup ui")
+        #print("first checkpoint in setup ui")
         font.setPointSize(64)
         self.PET.setFont(font)
         self.PET.setObjectName("PET")
@@ -226,7 +245,7 @@ class Preferences_Dialog(QtWidgets.QWidget):
         self.dogradiobtn = QtWidgets.QRadioButton(self.groupBox)
         self.dogradiobtn.setGeometry(QtCore.QRect(0, 50, 101, 17))
         font = QtGui.QFont()
-        print("second checkpoint in setup ui")
+        #print("second checkpoint in setup ui")
         font.setPointSize(14)
         self.dogradiobtn.setFont(font)
         self.dogradiobtn.setObjectName("dogradiobtn")
@@ -236,11 +255,11 @@ class Preferences_Dialog(QtWidgets.QWidget):
         font.setPointSize(14)
         self.pythonradiobtn.setFont(font)
         self.pythonradiobtn.setObjectName("pythonradiobtn")
-        print("between second and third checkpoint")
+        #print("between second and third checkpoint")
         self.save_btn = QtWidgets.QPushButton(self.centralwidget)
         self.save_btn.setGeometry(QtCore.QRect(220, 440, 91, 41))
         self.save_btn.setObjectName("save_btn")
-        print("another checkpoint")
+        #print("another checkpoint")
         self.save_btn.clicked.connect(self.save_it)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
@@ -250,7 +269,7 @@ class Preferences_Dialog(QtWidgets.QWidget):
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
-        print("third checkpoint in setup ui")
+        #print("third checkpoint in setup ui")
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
@@ -266,7 +285,7 @@ class Preferences_Dialog(QtWidgets.QWidget):
         self.pythonradiobtn.setText(_translate("MainWindow", "PYTHON"))
         self.save_btn.setText(_translate("MainWindow", "Save"))
     def save_it(self):
-        print("save was pressed")
+        #print("save was pressed")
         if self.pythonradiobtn.isChecked():
             self.switch_window.emit("python")
         else:
@@ -354,18 +373,18 @@ class ToDoList(QtWidgets.QWidget):
         self.listWidget.addItem(item)
 
     def returnPressed(self):
-        print("return pressed")
+        #print("return pressed")
         self.add_todo(self.lineEdit.text())
         self.lineEdit.setText("")
         self.setPetEmotion()
 
     def getPercentDone(self):
-        print("in getpercentdone")
+        #print("in getpercentdone")
         numItems=self.listWidget.count()
         numChecked=0
-        print("before loop",numItems)
+        #print("before loop",numItems)
         for item in range(numItems):
-            print("item=",item)
+            #print("item=",item)
             if self.listWidget.item(item).checkState()==QtCore.Qt.Checked:
                 numChecked+=1
             #print("self.listWidget.item",self.listWidget.item(item))
@@ -374,9 +393,9 @@ class ToDoList(QtWidgets.QWidget):
 
     def setPetEmotion(self):
         pctdone=self.getPercentDone()
-        print("percent done",pctdone)
+        #print("percent done",pctdone)
         if self.python:
-            print("its a python")
+            #print("its a python")
             if pctdone<=0.25:
                 self.label.setPixmap(QtGui.QPixmap(ToDoList.pythons[0]))
             elif 0.25<pctdone<=0.5:
@@ -386,7 +405,7 @@ class ToDoList(QtWidgets.QWidget):
             elif 0.75<pctdone<=1.0:
                 self.label.setPixmap(QtGui.QPixmap(ToDoList.pythons[3]))
         else:
-            print("its a dog")
+            #print("its a dog")
             if pctdone<=0.25:
                 self.label.setPixmap(QtGui.QPixmap(ToDoList.dogs[0]))
             elif 0.25<pctdone<=0.5:
@@ -406,7 +425,8 @@ class Controller:
         self.users=Users()
 
     def show_login(self):
-        print("in show login")
+        #print("in show login")
+        self.users.load_from_file("pickle")
         self.login=Login_Dialog(self)
         self.login_dialog=QtWidgets.QDialog()
         self.login.setupUi(self.login_dialog)
@@ -416,29 +436,29 @@ class Controller:
             self.dialog.close()
 
     def show_createacct(self):
-        print("in show_createacct")
+        #print("in show_createacct")
         self.createacct=Createacct_Dialog(self.users)
         self.dialog=QtWidgets.QDialog()
-        print("before setup ui")
+        #print("before setup ui")
         self.createacct.setupUi(self.dialog)
         self.createacct.switch_window.connect(self.show_next)
         self.dialog.show()
         self.login_dialog.close()
 
     def show_preferences(self):
-        print("in show preferences")
+        #print("in show preferences")
         self.preferences=Preferences_Dialog()
-        print("before qmainwindow")
+        #print("before qmainwindow")
         self.prefs_dialog=QtWidgets.QMainWindow()
-        print("before setup ui")
+        #print("before setup ui")
         self.preferences.setupUi(self.prefs_dialog)
-        print("after setup ui")
+        #print("after setup ui")
         self.preferences.switch_window.connect(self.show_next)
         self.prefs_dialog.show()
         self.login_dialog.close()
 
     def show_todolist(self):
-        print("in show todolist")
+        #print("in show todolist")
         self.todolist=ToDoList(self.python)
         self.todolist_dialog=QtWidgets.QMainWindow()
         self.todolist.setupUi(self.todolist_dialog)
@@ -447,7 +467,7 @@ class Controller:
         self.prefs_dialog.close()
 
     def show_next(self,next):
-        print("in show_next",next)
+        #print("in show_next",next)
         if next=="login":
             self.show_login()
         elif next=="create":
