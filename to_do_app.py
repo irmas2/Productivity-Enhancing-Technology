@@ -7,6 +7,7 @@ class Users:
         self.users=dict()
 
     def add_user(self,username,email,password):
+        print("in add user",username,email,password)
         if username not in self.users:
             self.users[username]=[password,email]
         else:
@@ -94,30 +95,32 @@ class Createacct_Dialog(QtWidgets.QWidget):
         print("in init")
         self.users=users
     def setupUi(self, Dialog):
-        print("in createacct setup ui")
         Dialog.setObjectName("Dialog")
         Dialog.resize(599, 559)
-        self.email_lineEdit_2 = QtWidgets.QTextEdit(Dialog)
-        self.email_lineEdit_2.setGeometry(QtCore.QRect(240, 230, 181, 31))
-        self.email_lineEdit_2.setObjectName("email_lineEdit_2")
-        self.email_lineEdit = QtWidgets.QLabel(Dialog)
-        self.email_lineEdit.setGeometry(QtCore.QRect(150, 230, 81, 31))
+        print("in setup ui")
+        self.email_lineEdit = QtWidgets.QLineEdit(Dialog)
+        self.email_lineEdit.setGeometry(QtCore.QRect(240, 230, 181, 31))
         self.email_lineEdit.setObjectName("email_lineEdit")
-        self.uname_lineEdit = QtWidgets.QLabel(Dialog)
-        self.uname_lineEdit.setGeometry(QtCore.QRect(150, 180, 81, 31))
+        self.email_label = QtWidgets.QLabel(Dialog)
+        self.email_label.setGeometry(QtCore.QRect(150, 230, 81, 31))
+        self.email_label.setObjectName("email_label")
+        self.uname_label = QtWidgets.QLabel(Dialog)
+        self.uname_label.setGeometry(QtCore.QRect(150, 180, 81, 31))
+        self.uname_label.setObjectName("uname_label")
+        self.uname_lineEdit = QtWidgets.QLineEdit(Dialog)
+        self.uname_lineEdit.setGeometry(QtCore.QRect(240, 180, 181, 31))
         self.uname_lineEdit.setObjectName("uname_lineEdit")
-        self.uname_lineEdit2 = QtWidgets.QTextEdit(Dialog)
-        self.uname_lineEdit2.setGeometry(QtCore.QRect(240, 180, 181, 31))
-        self.uname_lineEdit2.setObjectName("uname_lineEdit2")
-        self.password_lineEdit2 = QtWidgets.QTextEdit(Dialog)
-        self.password_lineEdit2.setGeometry(QtCore.QRect(240, 280, 181, 31))
-        self.password_lineEdit2.setObjectName("password_lineEdit2")
-        self.password_lineEdit = QtWidgets.QLabel(Dialog)
-        self.password_lineEdit.setGeometry(QtCore.QRect(150, 280, 81, 31))
+        self.uname_lineEdit.setText("hello")
+        self.password_lineEdit = QtWidgets.QLineEdit(Dialog)
+        self.password_lineEdit.setGeometry(QtCore.QRect(240, 280, 181, 31))
         self.password_lineEdit.setObjectName("password_lineEdit")
+        self.password_label = QtWidgets.QLabel(Dialog)
+        self.password_label.setGeometry(QtCore.QRect(150, 280, 81, 31))
+        self.password_label.setObjectName("password_label")
         self.signup_btn = QtWidgets.QPushButton(Dialog)
         self.signup_btn.setGeometry(QtCore.QRect(270, 341, 113, 41))
         self.signup_btn.setObjectName("signup_btn")
+        print("before clicked connect")
         self.signup_btn.clicked.connect(self.switch)
         self.PET = QtWidgets.QLabel(Dialog)
         self.PET.setGeometry(QtCore.QRect(250, 0, 151, 81))
@@ -144,9 +147,9 @@ class Createacct_Dialog(QtWidgets.QWidget):
     def retranslateUi(self, Dialog):
         _translate = QtCore.QCoreApplication.translate
         Dialog.setWindowTitle(_translate("Dialog", "Dialog"))
-        self.email_lineEdit.setText(_translate("Dialog", "EMAIL "))
-        self.uname_lineEdit.setText(_translate("Dialog", "USERNAME"))
-        self.password_lineEdit.setText(_translate("Dialog", "PASSWORD"))
+        self.email_label.setText(_translate("Dialog", "EMAIL "))
+        self.uname_label.setText(_translate("Dialog", "USERNAME"))
+        self.password_label.setText(_translate("Dialog", "PASSWORD"))
         self.signup_btn.setText(_translate("Dialog", "Sign Up"))
         self.PET.setText(_translate("Dialog", "PET"))
         self.productivity_enhancing_tech.setText(_translate("Dialog", "PRODUCTIVITY ENHANCING TECHNOLOGY"))
@@ -154,7 +157,14 @@ class Createacct_Dialog(QtWidgets.QWidget):
 
     def switch(self):
         print("you clicked me")
-        self.users.add_users(self.uname.text(),self.email.text(),self.password.text())
+        print(self.uname_lineEdit.text())
+        print("past text")
+        print(self.email_lineEdit.text())
+        print("past email")
+        print(self.password_lineEdit.text())
+        print("past password")
+        self.users.add_user(self.uname_lineEdit.text(),self.email_lineEdit.text(),self.password_lineEdit.text())
+        #self.users.add_user("fred","email@example.com","pass23")
         self.switch_window.emit("login")
 
         
